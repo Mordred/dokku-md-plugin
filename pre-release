@@ -1,0 +1,8 @@
+#!/bin/bash
+
+APP="$1"
+
+#Old way of storing passwords
+if [[ -f "$DOKKU_ROOT/.mariadb/pwd_${APP}" ]]; then
+  dokku mariadb:link $APP
+fi
