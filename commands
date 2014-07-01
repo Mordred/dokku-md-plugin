@@ -23,6 +23,13 @@ if [[ ! -d $DOKKU_ROOT/.mariadb ]]; then
     chown -R dokku: $DOKKU_ROOT/.mariadb
 fi
 
+set_dokku_env() {
+  env_var=$1
+  env_val=$2
+  ex -s -c "g/export ${env_var}=/d" -c "x" "$DOKKU_ROOT/$APP/ENV"
+  echo "export ${env_var}=\"${env_val}\"" >> "$DOKKU_ROOT/$APP/ENV"
+}
+
 case "$1" in
 
   mariadb:create)
@@ -133,8 +140,14 @@ case "$1" in
             DB_IMAGE="mariadb/$APP"
             DB_PASSWORD=$(cat "$DOKKU_ROOT/.mariadb/pwd_$APP")
             PORT=$(cat "$DOKKU_ROOT/.mariadb/port_$APP")
-            # Link database using dokku command
-            dokku config:set $APP "DATABASE_URL=mysql2://root:$DB_PASSWORD@172.17.42.1:$PORT/db DB_HOST=172.17.42.1 DB_PASS=$DB_PASSWORD DB_NAME=db DB_PORT=$PORT DB_USER=root"
+
+            # Link database
+            set_dokku_env DATABASE_URL "mysql2://root:$DB_PASSWORD@172.17.42.1:$PORT/db"
+            set_dokku_env DB_HOST "172.17.42.1"
+            set_dokku_env DB_PASS "$DB_PASSWORD"
+            set_dokku_env DB_NAME "db"
+            set_dokku_env DB_PORT "$PORT"
+            set_dokku_env DB_USER "root"
             exit 1
         fi
         DB_IMAGE="mariadb/$3"
@@ -144,8 +157,14 @@ case "$1" in
         fi
         DB_PASSWORD=$(cat "$DOKKU_ROOT/.mariadb/pwd_$3")
         PORT=$(cat "$DOKKU_ROOT/.mariadb/port_$3")
-        # Link database using dokku command
-        dokku config:set $APP "DATABASE_URL=mysql2://root:$DB_PASSWORD@172.17.42.1:$PORT/db DB_HOST=172.17.42.1 DB_PASSWORD=$DB_PASSWORD DB_NAME=db DB_PORT=$PORT DB_USER=root"
+
+        # Link database
+        set_dokku_env DATABASE_URL "mysql2://root:$DB_PASSWORD@172.17.42.1:$PORT/db"
+        set_dokku_env DB_HOST "172.17.42.1"
+        set_dokku_env DB_PASS "$DB_PASSWORD"
+        set_dokku_env DB_NAME "db"
+        set_dokku_env DB_PORT "$PORT"
+        set_dokku_env DB_USER "root"
 
         echo
         echo "-----> $APP linked to $DB_IMAGE database"
