@@ -35,7 +35,7 @@ This plugin adds following envvars to your project automatically:
 * DB_PORT
 * DB_NAME
 * DB_USER
-* DB_PASSWORD
+* DB_PASS
 
 Simple usage
 ------------
@@ -84,11 +84,6 @@ remote:        http://foo.server
 
 Advanced usage
 --------------
-
-Inititalize the database with SQL statements:
-```
-cat init.sql | dokku mariadb:create foo
-```
 
 Deleting databases:
 ```
